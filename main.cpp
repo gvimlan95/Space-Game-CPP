@@ -4,6 +4,9 @@
 #include <fstream>
 #include <thread>
 #include <future>
+#include <csignal>
+#include <afxres.h>
+#include "Ship.h"
 
 using namespace std;
 
@@ -18,14 +21,14 @@ class Fleet;
 
 class Gaia{
 private:
-    int colonistCount = 0;
-    long totalDistance = 9.4607e12*33; //(9.4607e12 * 33)km*1000 to convert to metres -> Distance of the planet
 //    long totalDistance = 100;
+    long long totalDistance = 9.4607e12*33; //(9.4607e12 * 33)km*1000 to convert to metres -> Distance of the planet
+    int colonistCount = 0;
 public:
     void setColonistCount(int colonistCount){
         Gaia::colonistCount = colonistCount;
     }
-    long getTotalDistance(){
+    long long getTotalDistance(){
         return Gaia::totalDistance;
     }
 
@@ -34,185 +37,7 @@ public:
     }
 };
 
-class Ship{
-private:
-    int energyConsumption = 0;
-    int weight = 0;
-    int cost = 0;
-    string typeName = "";
-    string className = "";
-    bool isDestroyed = false;
 
-public:
-    virtual int getNrProtected() const {
-        return 0;
-    }
-
-    virtual int getColonistCount() const {
-        return 0;
-    }
-
-    int getEnergyConsumption() const {
-        return energyConsumption;
-    }
-
-    void setEnergyConsumption(int energyConsumption) {
-        Ship::energyConsumption = energyConsumption;
-    }
-
-    int getWeight() const {
-        return weight;
-    }
-
-    void setWeight(int weight) {
-        Ship::weight = weight;
-    }
-
-    int getCost() const {
-        return cost;
-    }
-
-    void setCost(int cost) {
-        Ship::cost = cost;
-    }
-
-    const string &getTypeName() const {
-        return typeName;
-    }
-
-    void setTypeName(const string &typeName) {
-        Ship::typeName = typeName;
-    }
-
-    const string &getClassName() const{
-        return className;
-    }
-
-    void setClassName(const string &className){
-        Ship::className = className;
-    }
-
-    bool isIsDestroyed() const {
-        return isDestroyed;
-    }
-
-    void setIsDestroyed(bool isDestroyed) {
-        Ship::isDestroyed = isDestroyed;
-    }
-
-    virtual void infect(){
-        //TODO
-    }
-};
-
-class ColonyShip : public Ship{
-private:
-
-//    bool infected = false;
-    int colonistCount = 0;
-
-public:
-
-    ColonyShip(string typeName){
-        ColonyShip::setClassName("ColonyShip");
-        if(typeName == "Ferry"){
-            ColonyShip::colonistCount = 100;
-            ColonyShip::setCost(500);
-            ColonyShip::setWeight(10);
-            ColonyShip::setEnergyConsumption(5);
-        }else if(typeName == "Liner"){
-            ColonyShip::colonistCount = 250;
-            ColonyShip::setCost(1000);
-            ColonyShip::setWeight(20);
-            ColonyShip::setEnergyConsumption(7);
-        }else if(typeName == "Cloud"){
-            ColonyShip::colonistCount = 750;
-            ColonyShip::setCost(2000);
-            ColonyShip::setWeight(30);
-            ColonyShip::setEnergyConsumption(9);
-        }
-    }
-
-    virtual int getColonistCount() const {
-        return colonistCount;
-    }
-
-    void setColonistCount(int colonistCount) {
-        ColonyShip:: colonistCount = colonistCount;
-    }
-
-    virtual void infect(){
-        ColonyShip::colonistCount = 0;
-    }
-};
-
-class SolarSailShip : public Ship{
-private:
-    int energyProduction = 0;
-
-public:
-    SolarSailShip(string typeName){
-        SolarSailShip::setClassName("SolarSailShip");
-        if(typeName == "Radiant"){
-            SolarSailShip::energyProduction = 50;
-            SolarSailShip::setCost(50);
-            SolarSailShip::setWeight(3);
-            SolarSailShip::setEnergyConsumption(5);
-        }else if(typeName == "Ebulient"){
-            SolarSailShip::energyProduction = 500;
-            SolarSailShip::setCost(250);
-            SolarSailShip::setWeight(50);
-            SolarSailShip::setEnergyConsumption(5);
-        }
-    }
-    int getEnergyProduction() const {
-        return energyProduction;
-    }
-
-    void setEnergyProduction(int energyProduction) {
-        SolarSailShip::energyProduction = energyProduction;
-    }
-};
-
-class MilitaryEscortShip : public Ship{
-private:
-    int nrProtected = 0;
-
-public:
-    MilitaryEscortShip(string typeName){
-        MilitaryEscortShip::setClassName("MilitaryEscortShip");
-        if(typeName == "Cruiser"){
-            MilitaryEscortShip::nrProtected = 0/2;
-            MilitaryEscortShip::setCost(300);
-            MilitaryEscortShip::setWeight(2);
-            MilitaryEscortShip::setEnergyConsumption(10);
-        }else if(typeName == "Frigate"){
-            MilitaryEscortShip::nrProtected = 10/2;
-            MilitaryEscortShip::setCost(1000);
-            MilitaryEscortShip::setWeight(7);
-            MilitaryEscortShip::setEnergyConsumption(20);
-        }else if(typeName == "Destroyer"){
-            MilitaryEscortShip::nrProtected = 25/2;
-            MilitaryEscortShip::setCost(2000);
-            MilitaryEscortShip::setWeight(19);
-            MilitaryEscortShip::setEnergyConsumption(30);
-        }
-    }
-    virtual int getNrProtected() const {
-        return nrProtected;
-    }
-
-    void setNrProtected(int nrProtected) {
-        MilitaryEscortShip::nrProtected = nrProtected;
-    }
-};
-
-class MedicShip : public Ship{
-public:
-    MedicShip(){
-        MedicShip::setClassName("MedicShip");
-    }
-};
 
 class Fleet{
 private:
@@ -223,7 +48,7 @@ private:
     int energyProduction = 0;
     int countProtectedShips = 0;
     double currentTime = 0;
-    long currentDistance = 0;
+    long long currentDistance = 0;
     bool medic = false;
     int nrProtected = 0;
     string corporationName = "";
@@ -413,12 +238,14 @@ long fleetSpeed(Fleet *fleet){
 }
 
 int updateFleetTime(Fleet * fleet, long long newDistance){
-    usleep(100000*(fleet->getWeight()/100));
+    //usleep(100000*(fleet->getWeight()/100));
+    Sleep(100000*(fleet->getWeight()/100));
     fleet->setCurrentDistance(fleet->getCurrentDistance()+newDistance);
     fleet->setCurrentTime((fleet->getCurrentTime() + (newDistance / fleetSpeed(fleet)/(3600*24*365.25))));
 }
 
-mutex mtx;
+//mutex mtx;
+std::CreateMutex mtx;
 
 void mainProgram(Fleet* fleet,Gaia* gaia,int  i){
 
@@ -479,7 +306,8 @@ void printShipCurrentStatus(vector<Fleet*> fleetList,Gaia* gaia){
             cout << " End" << endl;
             cout << endl;
         }
-        usleep(1000000);
+        //usleep(1000000);
+        Sleep(1000000);
     }
 }
 
@@ -502,27 +330,44 @@ Fleet* userInterfaceCreateFleet(int i){
     for(int i =0;i<vec.size();i++){
         if(i%2 == 0){ //First column of the dat file
 
+            while(totalCash > 0)
             cout << vec.at(i) << " -  "<<vec.at(i+1) <<endl;
             if(vec.at(i) == "Ferry" || vec.at(i) == "Liner" || vec.at(i) == "Cloud"){
                 for(int j=0;j<stoi(vec.at(i+1));j++){
                     tempShip = new ColonyShip(vec.at(i));
+                    if(totalCash-tempShip->getCost()<0){
+                        break;
+                    }
                     shipList.push_back(tempShip);
+                    totalCash-=tempShip->getCost();
                 }
             }else if(vec.at(i) == "Radiant" || vec.at(i) == "Ebulient"){
                 for(int j=0;j<stoi(vec.at(i+1));j++) {
                     tempShip = new SolarSailShip(vec.at(i));
+                    if(totalCash-tempShip->getCost() < 0){
+                        break;
+                    }
                     shipList.push_back(tempShip);
+                    totalCash-=tempShip->getCost();
                 }
             }else if(vec.at(i) == "Cruiser" || vec.at(i) == "Frigate" || vec.at(i) == "Destroyer"){
                 for(int j=0;j<stoi(vec.at(i+1));j++) {
                     tempShip = new MilitaryEscortShip(vec.at(i));
+                    if(totalCash-tempShip->getCost() < 0){
+                        break;
+                    }
                     shipList.push_back(tempShip);
+                    totalCash-=tempShip->getCost();
                 }
             }else if(vec.at(i) == "Medic"){
                 //TODO:Medic ship found
                 for(int j=0;j<stoi(vec.at(i+1));j++) {
                     tempShip = new MedicShip();
+                    if(totalCash-tempShip->getCost() <0){
+                        break;
+                    }
                     shipList.push_back(tempShip);
+                    totalCash-=tempShip->getCost();
                 }
             }
         }
