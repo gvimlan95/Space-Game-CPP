@@ -333,39 +333,43 @@ Fleet* userInterfaceCreateFleet(int i){
             if (vec.at(i) == "Ferry" || vec.at(i) == "Liner" || vec.at(i) == "Cloud") {
                 for (int j = 0; j < stoi(vec.at(i + 1)); j++) {
                     tempShip = new ColonyShip(vec.at(i));
-                    if (totalCash - tempShip->getCost() < 0) {
-//                            break;
-                    }
                     shipList.push_back(tempShip);
-                    totalCash -= tempShip->getCost();
+                    if(totalCash-tempShip->getCost()<0){
+                        shipList.pop_back();
+                    }
+                    else
+                    totalCash-=tempShip->getCost();
                 }
             } else if (vec.at(i) == "Radiant" || vec.at(i) == "Ebulient") {
                 for (int j = 0; j < stoi(vec.at(i + 1)); j++) {
                     tempShip = new SolarSailShip(vec.at(i));
-                    if (totalCash - tempShip->getCost() < 0) {
-                        break;
-                    }
                     shipList.push_back(tempShip);
-                    totalCash -= tempShip->getCost();
+                    if(totalCash-tempShip->getCost() < 0){
+                        shipList.pop_back();
+                    }
+                    else
+                    totalCash-=tempShip->getCost();
                 }
             } else if (vec.at(i) == "Cruiser" || vec.at(i) == "Frigate" || vec.at(i) == "Destroyer") {
                 for (int j = 0; j < stoi(vec.at(i + 1)); j++) {
                     tempShip = new MilitaryEscortShip(vec.at(i));
-                    if (totalCash - tempShip->getCost() < 0) {
-                        break;
-                    }
                     shipList.push_back(tempShip);
-                    totalCash -= tempShip->getCost();
+                    if(totalCash-tempShip->getCost() < 0){
+                        shipList.pop_back();
+                    }
+                    else
+                    totalCash-=tempShip->getCost();
                 }
             } else if (vec.at(i) == "Medic") {
                 //TODO:Medic ship found
                 for (int j = 0; j < stoi(vec.at(i + 1)); j++) {
                     tempShip = new MedicShip();
-                    if (totalCash - tempShip->getCost() < 0) {
-                        break;
-                    }
                     shipList.push_back(tempShip);
-                    totalCash -= tempShip->getCost();
+                    if(totalCash-tempShip->getCost() <0){
+                        shipList.pop_back();
+                    }
+                    else
+                    totalCash-=tempShip->getCost();
                 }
             }
         }
