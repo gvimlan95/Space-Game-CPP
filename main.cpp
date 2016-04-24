@@ -5,7 +5,7 @@
 #include <thread>
 #include <future>
 #include <csignal>
-#include <afxres.h>
+//#include <afxres.h>
 #include "Ship.h"
 
 using namespace std;
@@ -179,13 +179,13 @@ public:
 
 void diseaseSpread(Fleet * fleet){
     //DISEASE SPREAD
-        if(fleet->hasMedic()){
-            cout << "The fleet is saved from disease! :D" << endl;
-        }else{
-            int random = rand() % fleet->getColonyShips().size();
-            fleet->getColonyShips().at(random)->infect();
-            cout << "The fleet died due to disease!!!!" << endl;
-        }
+    if(fleet->hasMedic()){
+        cout << "The fleet is saved from disease! :D" << endl;
+    }else{
+        int random = rand() % fleet->getColonyShips().size();
+        fleet->getColonyShips().at(random)->infect();
+        cout << "The fleet died due to disease!!!!" << endl;
+    }
     cout << "---------------------END-----------------------"<<endl;
 }
 
@@ -238,14 +238,14 @@ long fleetSpeed(Fleet *fleet){
 }
 
 int updateFleetTime(Fleet * fleet, long long newDistance){
-    //usleep(100000*(fleet->getWeight()/100));
-    Sleep(100000*(fleet->getWeight()/100));
+    usleep(100000*(fleet->getWeight()/100));
+//    Sleep(100000*(fleet->getWeight()/100));
     fleet->setCurrentDistance(fleet->getCurrentDistance()+newDistance);
     fleet->setCurrentTime((fleet->getCurrentTime() + (newDistance / fleetSpeed(fleet)/(3600*24*365.25))));
 }
 
-//mutex mtx;
-std::CreateMutex mtx;
+mutex mtx;
+//std::CreateMutex mtx;
 
 void mainProgram(Fleet* fleet,Gaia* gaia,int  i){
 
@@ -258,17 +258,17 @@ void mainProgram(Fleet* fleet,Gaia* gaia,int  i){
 
 
 
-//        float currentDistancePercentage = (fleet->getCurrentDistance()/(float)gaia->getTotalDistance())*100;
-////        cout << "-------------------Fleet "<< i<< "-----------------------"<<endl;
-//        cout << "Fleet"<<i<<": Start  ";
-//        for(int i =0;i<currentDistancePercentage/5;i++){
-//            cout << "* ";
-//        }
-//        for(float i = currentDistancePercentage/5;i<20;i++){
-//            cout << "- ";
-//        }
-//        cout << " End" << endl;
-//        cout << endl;
+        float currentDistancePercentage = (fleet->getCurrentDistance()/(float)gaia->getTotalDistance())*100;
+//        cout << "-------------------Fleet "<< i<< "-----------------------"<<endl;
+        cout << "Fleet"<<i<<": Start  ";
+        for(int i =0;i<currentDistancePercentage/5;i++){
+            cout << "* ";
+        }
+        for(float i = currentDistancePercentage/5;i<20;i++){
+            cout << "- ";
+        }
+        cout << " End " << "Distance from gaia: " << currentDistancePercentage <<"%" << endl;
+        cout << endl;
 
 
 
@@ -291,25 +291,25 @@ void mainProgram(Fleet* fleet,Gaia* gaia,int  i){
     mtx.unlock();
 }
 
-void printShipCurrentStatus(vector<Fleet*> fleetList,Gaia* gaia){
-    while(true) {
-        for (int i = 0; i < fleetList.size(); i++) {
-            float currentDistancePercentage =
-                    (fleetList.at(i)->getCurrentDistance() / (float) gaia->getTotalDistance()) * 100;
-            cout << "Fleet" << i << ": Start  ";
-            for (int i = 0; i < currentDistancePercentage / 5; i++) {
-                cout << "* ";
-            }
-            for (float i = currentDistancePercentage / 5; i < 20; i++) {
-                cout << "- ";
-            }
-            cout << " End" << endl;
-            cout << endl;
-        }
-        //usleep(1000000);
-        Sleep(1000000);
-    }
-}
+//void printShipCurrentStatus(vector<Fleet*> fleetList,Gaia* gaia){
+//    while(true) {
+//        for (int i = 0; i < fleetList.size(); i++) {
+//            float currentDistancePercentage =
+//                    (fleetList.at(i)->getCurrentDistance() / (float) gaia->getTotalDistance()) * 100;
+//            cout << "Fleet" << i << ": Start  ";
+//            for (int i = 0; i < currentDistancePercentage / 5; i++) {
+//                cout << "* ";
+//            }
+//            for (float i = currentDistancePercentage / 5; i < 20; i++) {
+//                cout << "- ";
+//            }
+//            cout << " End" << endl;
+//            cout << endl;
+//        }
+//        usleep(1000000);
+////        Sleep(1000000);
+//    }
+//}
 
 Fleet* userInterfaceCreateFleet(int i){
 
@@ -318,8 +318,8 @@ Fleet* userInterfaceCreateFleet(int i){
     Ship* tempShip;
     string fleetPath;
     cout << "Please enter the destination for the fleet no : " << i+1 << endl;
-        cin >> fleetPath;
-        ifstream fin(fleetPath);
+    cin >> fleetPath;
+    ifstream fin(fleetPath);
 //    ifstream fin("/Users/VIMLANG/ClionProjects/SpaceGame/file.dat");
     string str;
     vector<string> vec;
@@ -328,46 +328,44 @@ Fleet* userInterfaceCreateFleet(int i){
     }
 
     for(int i =0;i<vec.size();i++){
-        if(i%2 == 0){ //First column of the dat file
-
-            while(totalCash > 0)
-            cout << vec.at(i) << " -  "<<vec.at(i+1) <<endl;
-            if(vec.at(i) == "Ferry" || vec.at(i) == "Liner" || vec.at(i) == "Cloud"){
-                for(int j=0;j<stoi(vec.at(i+1));j++){
+        if(i%2 == 0) { //First column of the dat file
+            cout << vec.at(i) << " -  " << vec.at(i + 1) << endl;
+            if (vec.at(i) == "Ferry" || vec.at(i) == "Liner" || vec.at(i) == "Cloud") {
+                for (int j = 0; j < stoi(vec.at(i + 1)); j++) {
                     tempShip = new ColonyShip(vec.at(i));
-                    if(totalCash-tempShip->getCost()<0){
-                        break;
+                    if (totalCash - tempShip->getCost() < 0) {
+//                            break;
                     }
                     shipList.push_back(tempShip);
-                    totalCash-=tempShip->getCost();
+                    totalCash -= tempShip->getCost();
                 }
-            }else if(vec.at(i) == "Radiant" || vec.at(i) == "Ebulient"){
-                for(int j=0;j<stoi(vec.at(i+1));j++) {
+            } else if (vec.at(i) == "Radiant" || vec.at(i) == "Ebulient") {
+                for (int j = 0; j < stoi(vec.at(i + 1)); j++) {
                     tempShip = new SolarSailShip(vec.at(i));
-                    if(totalCash-tempShip->getCost() < 0){
+                    if (totalCash - tempShip->getCost() < 0) {
                         break;
                     }
                     shipList.push_back(tempShip);
-                    totalCash-=tempShip->getCost();
+                    totalCash -= tempShip->getCost();
                 }
-            }else if(vec.at(i) == "Cruiser" || vec.at(i) == "Frigate" || vec.at(i) == "Destroyer"){
-                for(int j=0;j<stoi(vec.at(i+1));j++) {
+            } else if (vec.at(i) == "Cruiser" || vec.at(i) == "Frigate" || vec.at(i) == "Destroyer") {
+                for (int j = 0; j < stoi(vec.at(i + 1)); j++) {
                     tempShip = new MilitaryEscortShip(vec.at(i));
-                    if(totalCash-tempShip->getCost() < 0){
+                    if (totalCash - tempShip->getCost() < 0) {
                         break;
                     }
                     shipList.push_back(tempShip);
-                    totalCash-=tempShip->getCost();
+                    totalCash -= tempShip->getCost();
                 }
-            }else if(vec.at(i) == "Medic"){
+            } else if (vec.at(i) == "Medic") {
                 //TODO:Medic ship found
-                for(int j=0;j<stoi(vec.at(i+1));j++) {
+                for (int j = 0; j < stoi(vec.at(i + 1)); j++) {
                     tempShip = new MedicShip();
-                    if(totalCash-tempShip->getCost() <0){
+                    if (totalCash - tempShip->getCost() < 0) {
                         break;
                     }
                     shipList.push_back(tempShip);
-                    totalCash-=tempShip->getCost();
+                    totalCash -= tempShip->getCost();
                 }
             }
         }
