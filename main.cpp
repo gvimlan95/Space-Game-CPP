@@ -399,6 +399,7 @@ int main(){
 
     int counter = totalFleetCount;
     string isRun = "";
+    cout << "Disclaimer : Balance cash is insufficient to purchase all selected ship ! " <<endl;
     cout << "Would you like to start the program now?"<< endl;
     cin >> isRun;
     if(isRun == "yes") {
